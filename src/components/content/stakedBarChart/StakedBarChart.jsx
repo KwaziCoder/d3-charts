@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import classes from "./StakedBarChart.module.css";
-import { select, scaleLinear, scaleBand, axisBottom, stack, max, axisLeft, stackOrderAscending } from "d3";
+import {
+  select,
+  scaleLinear,
+  scaleBand,
+  axisBottom,
+  stack,
+  max,
+  axisLeft,
+  stackOrderAscending,
+} from "d3";
 import useResizeObserver from "./../../../hooks/useResizeObserver";
+import Tooltip from "@mui/material/Tooltip";
 
 const data = [
   {
@@ -49,6 +59,7 @@ const StakedBarChart = () => {
   const dimensions = useResizeObserver(wrapperRef);
 
   const [keys, setKeys] = useState(allKeys);
+  const [tooptipText, setTooltipText] = useState("")
 
   useEffect(() => {
     const svg = select(svgRef.current);
@@ -62,16 +73,14 @@ const StakedBarChart = () => {
       0,
       max(layers, (layer) => max(layer, (sequence) => sequence[1])),
     ];
-    
 
     const xScale = scaleBand()
       .domain(data.map((d) => d.year))
       .range([0, width])
       .padding(0.25);
 
-    const yScale = scaleLinear()
-    yScale.domain(extent).range([height, 0])
-      
+    const yScale = scaleLinear();
+    yScale.domain(extent).range([height, 0]);
 
     const xAxis = axisBottom(xScale);
     svg
@@ -80,38 +89,50 @@ const StakedBarChart = () => {
       .call(xAxis);
 
     const yAsix = axisLeft(yScale);
-    svg
-      .select(".y-axis")
-      .call(yAsix);
-
+    svg.select(".y-axis").call(yAsix);
 
     svg
-      .selectAll('.layer')
+      .selectAll(".layer")
       .data(layers)
       .join("g")
       .attr("class", "layer")
-      .attr("fill", layer => colors[layer.key])
+      .attr("fill", (layer) => colors[layer.key])
       //.attr("transform", "scale(1, -1)")
       .selectAll("rect")
-      .data(layer => layer)
-      .join('rect')
-      .attr("x", sequence => {
-        return xScale(sequence.data.year)
+      .data((layer) => layer)
+      .join("rect")
+      //.attr("class", layer => layer)
+      .attr("x", (sequence) => {
+        return xScale(sequence.data.year);
       })
       .attr("width", xScale.bandwidth())
-      .attr("y", sequence => (yScale(sequence[1])))
-      .transition()
-      .attr("height", sequence => yScale(sequence[0]) - yScale(sequence[1]))
-
+      .attr("y", (sequence) => yScale(sequence[1]))
+      .on("mouseenter", (event, value) => {
+        console.log(event.toElement)
+        const { data } = value;
+        const cites = Object.keys(data);
+        let string = "";
+        for (let i = 1; i < cites.length; i++) {
+          string += `${cites[i]}: ${data[cites[i]]}\n`
+        }
+        setTooltipText(string);
+      })
+      .on("mouseleave", () => {
+        setTooltipText("");
+      })
+      //.transition()
+      .attr("height", (sequence) => yScale(sequence[0]) - yScale(sequence[1]));
   }, [dimensions, keys]);
 
   return (
     <>
       <div ref={wrapperRef} className={classes.wrapper}>
-        <svg ref={svgRef} className={classes.svgContainer}>
-          <g className="x-axis" />
-          <g className="y-axis" />
-        </svg>
+        <Tooltip title={tooptipText} followCursor>
+          <svg ref={svgRef} className={classes.svgContainer}>
+            <g className="x-axis" />
+            <g className="y-axis" />
+          </svg>
+        </Tooltip>
       </div>
 
       <div className={classes.fields}>
