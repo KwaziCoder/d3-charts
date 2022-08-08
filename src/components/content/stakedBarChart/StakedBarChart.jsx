@@ -91,6 +91,7 @@ const StakedBarChart = () => {
       .join("g")
       .attr("class", "layer")
       .attr("fill", layer => colors[layer.key])
+      //.attr("transform", "scale(1, -1)")
       .selectAll("rect")
       .data(layer => layer)
       .join('rect')
@@ -98,7 +99,8 @@ const StakedBarChart = () => {
         return xScale(sequence.data.year)
       })
       .attr("width", xScale.bandwidth())
-      .attr("y", sequence => yScale(sequence[1]))
+      .attr("y", sequence => (yScale(sequence[1])))
+      .transition()
       .attr("height", sequence => yScale(sequence[0]) - yScale(sequence[1]))
 
   }, [dimensions, keys]);
@@ -119,6 +121,7 @@ const StakedBarChart = () => {
               <input
                 id={key}
                 type="checkbox"
+                checked={keys.includes(key)}
                 onChange={(e) => {
                   if (e.target.checked) {
                     setKeys(Array.from(new Set([...keys, key])));
