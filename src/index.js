@@ -4,18 +4,23 @@ import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
-import CurvedLineChart from "./components/curvedLineChart/CurvedLineChart";
-import BarChart from './components/barChart/BarChart'
+import Content from "./components/content/Content";
+import CurvedLineChart from "./components/content/curvedLineChart/CurvedLineChart";
+import BarChart from "./components/content/barChart/BarChart";
+import StakedBarChart from "./components/content/stakedBarChart/StakedBarChart";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Header/>
-      <Routes>
-        <Route path="/" element={<CurvedLineChart/>}/>
-        <Route path="/barChart" element={<BarChart/>}/>
-      </Routes>
+      <Header />
+      <Content>
+        <Routes>
+          <Route path="/" element={<StakedBarChart />} />
+          <Route path="/barChart" element={<BarChart />} />
+          <Route path="/curvedLineChart" element={<CurvedLineChart />} />
+        </Routes>
+      </Content>
     </BrowserRouter>
   </React.StrictMode>
 );

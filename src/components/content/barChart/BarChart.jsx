@@ -1,16 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import classes from "./BarChart.module.css";
-import {
-  select,
-  axisBottom,
-  axisLeft,
-  scaleLinear,
-  scaleBand,
-} from "d3";
-import useResizeObserver from "../../hooks/useResizeObserver";
-
-
-
+import { select, axisBottom, axisLeft, scaleLinear, scaleBand } from "d3";
+import useResizeObserver from "../../../hooks/useResizeObserver";
 
 const chartdata = [
   { year: 2019, sales: 12342 },
@@ -51,9 +42,7 @@ const BarChart = () => {
       .call(xAxis);
 
     const yAxis = axisLeft(yScale);
-    svg
-      .select(".y-axis")
-      .call(yAxis);
+    svg.select(".y-axis").call(yAxis);
 
     svg
       .selectAll(".bar")
@@ -69,13 +58,11 @@ const BarChart = () => {
       .attr("fill", (value) => colorScale(value.sales));
   }, [dimensions]);
   return (
-    <div className={classes.chart}>
-      <div className={classes.wrapper} ref={wrapperRef}>
-        <svg className={classes.svgContainer} ref={svgRef}>
-          <g className="x-axis" />
-          <g className="y-axis" />
-        </svg>
-      </div>
+    <div className={classes.wrapper} ref={wrapperRef}>
+      <svg className={classes.svgContainer} ref={svgRef}>
+        <g className="x-axis" />
+        <g className="y-axis" />
+      </svg>
     </div>
   );
 };
