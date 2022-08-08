@@ -6,7 +6,8 @@ const Header = () => {
   return (
     <div>
       <nav style={{display: "flex", flexDirection: "row", justifyContent: "space-around", alignItems: "center"}}>
-        <Link to="/">Curved Line Chart</Link>
+        <Link to="/">Staked Bar Chart</Link>
+        <Link to="/curvedLineChart">Curved Line Chart</Link>
         <Link to="/barChart">Bar Chart</Link>
       </nav>
     </div>
