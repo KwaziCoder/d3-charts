@@ -1,7 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import classes from "./BarChart.module.css";
-import { select, axisBottom, axisLeft, scaleLinear, scaleBand, mouse } from "d3";
-import Tooltip from "@mui/material/Tooltip";
+import {
+  select,
+  axisBottom,
+  axisLeft,
+  scaleLinear,
+  scaleBand,
+} from "d3";
+import useResizeObserver from "../../hooks/useResizeObserver";
+
+
+
 
 const chartdata = [
   { year: 2019, sales: 12342 },
@@ -12,17 +21,23 @@ const chartdata = [
 
 const BarChart = () => {
   const svgRef = useRef();
+  const wrapperRef = useRef();
+  const dimensions = useResizeObserver(wrapperRef);
   const [data, setData] = useState([...chartdata]);
 
   useEffect(() => {
     const svg = select(svgRef.current);
 
+    if (!dimensions) return;
+
     const xScale = scaleBand()
       .domain(data.map((value, index) => index))
-      .range([0, 900])
+      .range([0, dimensions.width])
       .padding(0.5);
 
-    const yScale = scaleLinear().domain([0, 100000]).range([450, 0]);
+    const yScale = scaleLinear()
+      .domain([0, 100000])
+      .range([dimensions.height, 0]);
 
     const colorScale = scaleLinear()
       .domain([0, 50000, 100000])
@@ -30,12 +45,15 @@ const BarChart = () => {
       .clamp(true);
 
     const xAxis = axisBottom(xScale).tickFormat((index) => data[index].year);
-    svg.select(".x-axis").style("transform", "translateY(450px)").call(xAxis);
+    svg
+      .select(".x-axis")
+      .style("transform", `translateY(${dimensions.height}px)`)
+      .call(xAxis);
 
     const yAxis = axisLeft(yScale);
-    svg.select(".y-axis").call(yAxis);
-
-  
+    svg
+      .select(".y-axis")
+      .call(yAxis);
 
     svg
       .selectAll(".bar")
@@ -44,19 +62,20 @@ const BarChart = () => {
       .attr("class", "bar")
       .attr("transform", "scale(1, -1)")
       .attr("x", (_, index) => xScale(index))
-      .attr("y", -450)
+      .attr("y", -dimensions.height)
       .attr("width", xScale.bandwidth())
-      
       .transition()
-      .attr("height", (value) => 450 - yScale(value.sales))
+      .attr("height", (value) => dimensions.height - yScale(value.sales))
       .attr("fill", (value) => colorScale(value.sales));
-  }, []);
+  }, [dimensions]);
   return (
     <div className={classes.chart}>
-      <svg className={classes.svgContainer} ref={svgRef}>
-        <g className="x-axis" />
-        <g className="y-axis" />
-      </svg>
+      <div className={classes.wrapper} ref={wrapperRef}>
+        <svg className={classes.svgContainer} ref={svgRef}>
+          <g className="x-axis" />
+          <g className="y-axis" />
+        </svg>
+      </div>
     </div>
   );
 };
