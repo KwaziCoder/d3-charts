@@ -1,0 +1,11 @@
+.chart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.svgContainer {
+  margin-top: 50px;
+  background-color: rgb(229, 231, 231);
+  overflow: visible;
+}
